@@ -5,8 +5,7 @@ import (
 	"log"
 	"os"
 
-	"csv-tools/csv/col"
-
+	"github.com/palsivertsen/csv-tools/csv/col"
 	"github.com/urfave/cli/v2"
 )
 

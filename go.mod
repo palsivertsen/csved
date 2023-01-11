@@ -1,4 +1,4 @@
-module csv-tools
+module github.com/palsivertsen/csv-tools
 
 go 1.19
 
