@@ -8,8 +8,12 @@ func Command() *cli.Command {
 		Usage: "Manipulate columns",
 		Subcommands: []*cli.Command{
 			{
+				Name:   "header",
+				Action: CMDPrintHeader,
+			},
+			{
 				Name:   "rm",
-				Action: RM,
+				Action: CMDRemove,
 				Flags: []cli.Flag{
 					&cli.IntSliceFlag{
 						Name:    "columns",

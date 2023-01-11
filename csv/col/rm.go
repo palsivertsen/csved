@@ -11,7 +11,7 @@ import (
 	"golang.org/x/exp/slices"
 )
 
-func RM(ctx *cli.Context) error {
+func CMDRemove(ctx *cli.Context) error {
 	in := os.Stdin
 	out := os.Stdout
 	cols := ctx.IntSlice("columns")
