@@ -14,16 +14,17 @@ import (
 
 func App() *cli.App {
 	return &cli.App{
-		Name:                 "csv",
+		Usage:                "manipulate csv streams",
 		EnableBashCompletion: true,
 		Commands: []*cli.Command{
 			{
-				Name: "column",
+				Name:  "column",
+				Usage: "edit columns",
 				Subcommands: []*cli.Command{
 					removeColumnCommand(),
-					printHeaderCommand(),
 				},
 			},
+			printHeaderCommand(),
 			completionHelper(),
 		},
 	}
@@ -31,7 +32,8 @@ func App() *cli.App {
 
 func removeColumnCommand() *cli.Command {
 	return &cli.Command{
-		Name: "remove",
+		Name:  "remove",
+		Usage: "remove columns",
 		Flags: []cli.Flag{
 			&cli.IntSliceFlag{
 				Name: "columns",
@@ -60,7 +62,8 @@ func removeColumnCommand() *cli.Command {
 
 func printHeaderCommand() *cli.Command {
 	return &cli.Command{
-		Name: "header",
+		Name:  "header",
+		Usage: "print header",
 		Action: func(ctx *cli.Context) error {
 			reader := csv.NewReader(ctx.App.Reader)
 
@@ -90,7 +93,7 @@ var script string
 func completionHelper() *cli.Command {
 	return &cli.Command{
 		Name:  "completion",
-		Usage: "print completion script",
+		Usage: "shell completion scripts",
 		Description: `For bash run:
 	PROG=csv eval "$(csv completion --shell=bash)"`,
 		Flags: []cli.Flag{
