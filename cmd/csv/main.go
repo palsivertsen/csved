@@ -5,8 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/palsivertsen/csv-tools/csv/col"
-	"github.com/urfave/cli/v2"
+	"github.com/palsivertsen/csv-tools/app"
 )
 
 func main() {
@@ -16,13 +15,7 @@ func main() {
 }
 
 func run() error {
-	app := cli.App{
-		Name:                 "csv",
-		EnableBashCompletion: true,
-		Commands: []*cli.Command{
-			col.Command(),
-		},
-	}
+	app := app.App()
 
 	if err := app.Run(os.Args); err != nil {
 		return fmt.Errorf("run: %w", err)
