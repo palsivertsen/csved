@@ -18,7 +18,7 @@ func run() error {
 	app := app.App()
 
 	if err := app.Run(os.Args); err != nil {
-		return fmt.Errorf("run: %w", err)
+		return fmt.Errorf("app run: %w", err)
 	}
 
 	return nil

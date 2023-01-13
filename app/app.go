@@ -1,6 +1,7 @@
 package app
 
 import (
+	_ "embed"
 	"encoding/csv"
 	"errors"
 	"fmt"
@@ -23,6 +24,7 @@ func App() *cli.App {
 					printHeaderCommand(),
 				},
 			},
+			completionHelper(),
 		},
 	}
 }
@@ -74,6 +76,40 @@ func printHeaderCommand() *cli.Command {
 				if _, err := fmt.Fprintf(ctx.App.Writer, "%d: %s\n", i, col); err != nil {
 					return fmt.Errorf("write header: %w", err)
 				}
+			}
+
+			return nil
+		},
+	}
+}
+
+//go:generate curl -O https://raw.githubusercontent.com/urfave/cli/v2.23.7/autocomplete/bash_autocomplete
+//go:embed bash_autocomplete
+var script string
+
+func completionHelper() *cli.Command {
+	return &cli.Command{
+		Name:  "completion",
+		Usage: "print completion script",
+		Description: `For bash run:
+	PROG=csv eval "$(csv completion --shell=bash)"`,
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:     "shell",
+				Required: true,
+				Action: func(ctx *cli.Context, shell string) error {
+					switch shell {
+					case "bash":
+						return nil
+					}
+
+					return fmt.Errorf("shell %q not supported", shell)
+				},
+			},
+		},
+		Action: func(ctx *cli.Context) error {
+			if _, err := fmt.Fprint(ctx.App.Writer, script); err != nil {
+				return fmt.Errorf("print script: %w", err)
 			}
 
 			return nil
