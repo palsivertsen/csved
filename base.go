@@ -47,3 +47,11 @@ func (e RowError) Error() string {
 func (e RowError) Unwrap() error {
 	return e.Err
 }
+
+type MissingColumnError struct {
+	Actual, Expected int
+}
+
+func (e MissingColumnError) Error() string {
+	return fmt.Sprintf("row too short: %d (expected %d)", e.Actual, e.Expected)
+}

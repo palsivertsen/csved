@@ -6,6 +6,9 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"regexp"
+	"strconv"
+	"strings"
 
 	csvtools "github.com/palsivertsen/csv-tools"
 	"github.com/palsivertsen/csv-tools/csv/col"
@@ -26,6 +29,7 @@ func App() *cli.App {
 			},
 			printCommand(),
 			completionHelper(),
+			filterCommand(),
 		},
 	}
 }
@@ -124,3 +128,72 @@ func completionHelper() *cli.Command {
 		},
 	}
 }
+
+const flagColumnRegexP = "column-regexp"
+
+func filterCommand() *cli.Command {
+	return &cli.Command{
+		Name:  "filter",
+		Usage: "filter row by column(s)",
+		Flags: []cli.Flag{
+			&cli.StringSliceFlag{
+				Name:  flagColumnRegexP,
+				Usage: "column-index:regex-pattern",
+			},
+		},
+		Action: func(ctx *cli.Context) error {
+			rules := ctx.StringSlice(flagColumnRegexP)
+			matcher := make(col.AllRowMatcher, 0, len(rules))
+
+			for i, cr := range ctx.StringSlice(flagColumnRegexP) {
+				sp := strings.SplitN(cr, ":", 2)
+				if len(sp) != 2 {
+					return ParamError{Name: flagColumnRegexP}
+				}
+
+				colIndexString, regexPattern := sp[0], sp[1]
+				colIndex, err := strconv.Atoi(colIndexString)
+				if err != nil {
+					return ParamError{Name: flagColumnRegexP, Err: fmt.Errorf("param #%d: parse column index %q: %w", i, colIndexString, err)}
+				}
+
+				comp, err := regexp.Compile(regexPattern)
+				if err != nil {
+					return ParamError{Name: flagColumnRegexP, Err: fmt.Errorf("param #%d: parse pattern: %w", i, err)}
+				}
+
+				matcher = append(
+					matcher,
+					&col.IndexMatcher{
+						Index: colIndex,
+						Matcher: col.StringMatcherFunc(func(s string) (bool, error) {
+							return comp.MatchString(s), nil
+						}),
+					},
+				)
+			}
+
+			reader := col.FilterReader{
+				Reader:  csv.NewReader(ctx.App.Reader),
+				Matcher: matcher,
+			}
+			writer := csv.NewWriter(ctx.App.Writer)
+			defer writer.Flush()
+
+			if _, err := csvtools.Copy(writer, &reader); err != nil {
+				return fmt.Errorf("copy: %w", err)
+			}
+
+			return nil
+		},
+	}
+}
+
+type ParamError struct {
+	Name string
+	Err  error
+}
+
+func (e ParamError) Error() string { return fmt.Sprintf("malformed parameter %q", e.Name) }
+
+func (e ParamError) Unwrap() error { return e.Err }

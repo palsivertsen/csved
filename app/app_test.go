@@ -17,34 +17,45 @@ func TestApp(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
-		args string
+		args []string
 		in   string
 		out  string
 	}{
 		// remove columns
 		{
-			args: "csv column remove -columns 1",
+			args: strings.Split("csv column remove --columns 1", " "),
 			in:   "a,b,c",
 			out:  "a,c\n",
 		},
 		{
-			args: "csv column remove -columns 1,0",
+			args: strings.Split("csv column remove --columns 1,0", " "),
 			in:   "a,b,c",
 			out:  "c\n",
 		},
 		{
-			args: "csv column remove -columns 0 -columns 1",
+			args: strings.Split("csv column remove --columns 0 --columns 1", " "),
 			in:   "a,b,c",
 			out:  "c\n",
 		},
 		// print header
 		{
-			args: "csv print header",
+			args: strings.Split("csv print header", " "),
 			in:   "a,b,c\n1,2,3",
 			out:  "0: a\n1: b\n2: c\n",
 		},
 		{
-			args: "csv print header",
+			args: strings.Split("csv print header", " "),
+		},
+		// filter
+		{
+			args: []string{"csv", "filter", "--column-regexp", "2:^ "},
+			in:   "a,b,c\n1,2, 3",
+			out:  "1,2, 3\n",
+		},
+		{
+			args: []string{"csv", "filter", "--column-regexp", "0:[[:alpha:]]"},
+			in:   "a,b,c\n1,2,3\n4,5,6",
+			out:  "a,b,c\n",
 		},
 	}
 	for testNum, tt := range tests {
@@ -60,7 +71,7 @@ func TestApp(t *testing.T) {
 			unit.Writer = &out
 			unit.ExitErrHandler = func(*cli.Context, error) {}
 
-			require.NoError(t, unit.Run(strings.Split(tt.args, " ")))
+			require.NoError(t, unit.Run(tt.args))
 			assert.Equal(t, tt.out, out.String())
 		})
 	}
