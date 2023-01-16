@@ -39,12 +39,12 @@ func TestApp(t *testing.T) {
 		},
 		// print header
 		{
-			args: "csv header",
+			args: "csv print header",
 			in:   "a,b,c\n1,2,3",
 			out:  "0: a\n1: b\n2: c\n",
 		},
 		{
-			args: "csv header",
+			args: "csv print header",
 		},
 	}
 	for testNum, tt := range tests {

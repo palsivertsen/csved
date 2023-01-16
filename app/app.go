@@ -24,7 +24,7 @@ func App() *cli.App {
 					removeColumnCommand(),
 				},
 			},
-			printHeaderCommand(),
+			printCommand(),
 			completionHelper(),
 		},
 	}
@@ -60,28 +60,33 @@ func removeColumnCommand() *cli.Command {
 	}
 }
 
-func printHeaderCommand() *cli.Command {
+func printCommand() *cli.Command {
 	return &cli.Command{
-		Name:  "header",
-		Usage: "print header",
-		Action: func(ctx *cli.Context) error {
-			reader := csv.NewReader(ctx.App.Reader)
+		Name: "print",
+		Subcommands: []*cli.Command{
+			{
+				Name:  "header",
+				Usage: "print header",
+				Action: func(ctx *cli.Context) error {
+					reader := csv.NewReader(ctx.App.Reader)
 
-			row, err := reader.Read()
-			if err != nil {
-				if errors.Is(err, io.EOF) {
+					row, err := reader.Read()
+					if err != nil {
+						if errors.Is(err, io.EOF) {
+							return nil
+						}
+						return fmt.Errorf("read first row: %w", err)
+					}
+
+					for i, col := range row {
+						if _, err := fmt.Fprintf(ctx.App.Writer, "%d: %s\n", i, col); err != nil {
+							return fmt.Errorf("write header: %w", err)
+						}
+					}
+
 					return nil
-				}
-				return fmt.Errorf("read first row: %w", err)
-			}
-
-			for i, col := range row {
-				if _, err := fmt.Fprintf(ctx.App.Writer, "%d: %s\n", i, col); err != nil {
-					return fmt.Errorf("write header: %w", err)
-				}
-			}
-
-			return nil
+				},
+			},
 		},
 	}
 }
