@@ -57,6 +57,12 @@ func TestApp(t *testing.T) {
 			in:   "a,b,c\n1,2,3\n4,5,6",
 			out:  "a,b,c\n",
 		},
+		// pick columns
+		{
+			args: strings.Split("csv column pick --columns 1,2", " "),
+			in:   "a,b,c",
+			out:  "b,c\n",
+		},
 	}
 	for testNum, tt := range tests {
 		tt := tt

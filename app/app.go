@@ -25,6 +25,7 @@ func App() *cli.App {
 				Usage: "edit columns",
 				Subcommands: []*cli.Command{
 					removeColumnCommand(),
+					pickColumnCommand(),
 				},
 			},
 			printCommand(),
@@ -45,6 +46,36 @@ func removeColumnCommand() *cli.Command {
 		},
 		Action: func(ctx *cli.Context) error {
 			reader := col.NewRemoverReader(
+				csv.NewReader(ctx.App.Reader),
+				ctx.IntSlice("columns")...,
+			)
+
+			writer := csv.NewWriter(ctx.App.Writer)
+			defer writer.Flush()
+
+			if rowNumber, err := csvtools.Copy(writer, reader); err != nil {
+				return csvtools.RowError{
+					RowNumber: rowNumber,
+					Err:       err,
+				}
+			}
+
+			return nil
+		},
+	}
+}
+
+func pickColumnCommand() *cli.Command {
+	return &cli.Command{
+		Name:  "pick",
+		Usage: "pick columns",
+		Flags: []cli.Flag{
+			&cli.IntSliceFlag{
+				Name: "columns",
+			},
+		},
+		Action: func(ctx *cli.Context) error {
+			reader := col.NewPickReader(
 				csv.NewReader(ctx.App.Reader),
 				ctx.IntSlice("columns")...,
 			)
