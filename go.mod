@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/davecgh/go-spew v1.1.1
 	github.com/stretchr/testify v1.8.1
-	github.com/urfave/cli/v2 v2.23.7
+	github.com/urfave/cli/v2 v2.25.1
 	golang.org/x/exp v0.0.0-20230108222341-4b8118a2686a
 )
 

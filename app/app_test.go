@@ -50,7 +50,7 @@ func TestApp(t *testing.T) {
 		{
 			args: []string{"csv", "filter", "--column-regexp", "2:^ "},
 			in:   "a,b,c\n1,2, 3",
-			out:  "1,2, 3\n",
+			out:  "1,2,\" 3\"\n",
 		},
 		{
 			args: []string{"csv", "filter", "--column-regexp", "0:[[:alpha:]]"},

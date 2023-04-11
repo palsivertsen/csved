@@ -168,8 +168,9 @@ func filterCommand() *cli.Command {
 		Usage: "filter row by column(s)",
 		Flags: []cli.Flag{
 			&cli.StringSliceFlag{
-				Name:  flagColumnRegexP,
-				Usage: "column-index:regex-pattern",
+				Name:      flagColumnRegexP,
+				Usage:     "column-index:regex-pattern",
+				KeepSpace: true,
 			},
 		},
 		Action: func(ctx *cli.Context) error {
